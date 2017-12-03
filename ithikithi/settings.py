@@ -54,6 +54,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CORS_ORIGIN_WHITELIST = ('*',)
+
 ROOT_URLCONF = 'ithikithi.urls'
 
 TEMPLATES = [
