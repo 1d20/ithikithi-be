@@ -32,7 +32,8 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'person.apps.PersonConfig',
-    
+    'booking.apps.BookingConfig',
+    'ticket.apps.TicketConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
