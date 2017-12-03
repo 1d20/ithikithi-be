@@ -4,3 +4,4 @@ from person import models
 
 
 admin.site.register(models.Person)
+admin.site.register(models.CustomUser)

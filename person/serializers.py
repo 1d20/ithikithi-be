@@ -14,7 +14,7 @@ class AuthenticationSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=255)
 
 
-class UserSerializer(serializers.ModelSerializer):
+class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.User
-        fields = ['username', 'email']
+        model = models.CustomUser
+        fields = ['username', 'email', 'is_confirmed', 'confirm_time']

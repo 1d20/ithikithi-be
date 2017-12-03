@@ -1,10 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import User
+from person.models import CustomUser
 from django.utils import timezone
 
 
 class Booking(models.Model):
-    user_id = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
+    user_id = models.ForeignKey(CustomUser, blank=True, null=True, on_delete=models.SET_NULL)
     email = models.EmailField()
 
     def __str__(self):

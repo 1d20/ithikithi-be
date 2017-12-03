@@ -1,10 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import User
+from person.models import CustomUser
 from booking.models import BookingPerson
 
 
 class Ticket(models.Model):
-    user = models.ManyToManyField(User)
+    user = models.ManyToManyField(CustomUser)
     booking_person_id = models.OneToOneField(BookingPerson, on_delete=models.DO_NOTHING)
 
     def __str__(self):

@@ -131,3 +131,10 @@ REST_FRAMEWORK = {
         # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+# Test mail-box
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'test1user7317@gmail.com'
+EMAIL_HOST_PASSWORD = 'testtesttesttest'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
