@@ -3,5 +3,5 @@ from booking import views
 
 
 router = routers.DefaultRouter()
-router.register(r'booking', views.BookingViewSet)
-router.register(r'booking-person', views.BookingPersonViewSet)
+router.register(r'booking', views.BookingViewSet, base_name='booking')
+router.register(r'booking-person', views.BookingPersonViewSet, base_name='booking_person')
