@@ -57,7 +57,7 @@ class AuthenticationViewSet(viewsets.ViewSet):
                 token = secrets.token_urlsafe(20)
                 send_mail(
                     subject='Test',
-                    message='''Test %s ''' % (request.META['HTTP_ORIGIN'] + '/api/person/authenticate/confirm/' + token),
+                    message='''Test %s ''' % (request.build_absolute_uri('/') + 'api/person/authenticate/confirm/' + token),
                     from_email=EMAIL_HOST_USER,
                     recipient_list=[data['email']],
                     fail_silently=False
