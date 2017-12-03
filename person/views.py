@@ -6,22 +6,25 @@ from django.utils import timezone
 from datetime import timedelta
 
 from django.contrib.auth import authenticate, login, logout
-from rest_framework.decorators import list_route, detail_route
+from rest_framework.decorators import list_route, permission_classes
 from rest_framework.response import Response
 from django.core.mail import send_mail
 from ithikithi.settings import EMAIL_HOST_USER
-from person import serializers, models
+from person import serializers, models, permissions
+from rest_framework import permissions as django_permissions
 
 
 class PersonViewSet(viewsets.ModelViewSet):
     queryset = models.Person.objects.all()
     serializer_class = serializers.PersonSerializer
+    permission_classes = (permissions.IsPersonOwner, django_permissions.IsAdminUser)
 
 
 class AuthenticationViewSet(viewsets.ViewSet):
     serializer_class = serializers.AuthenticationSerializer
 
     @list_route(methods=['post'])
+    @permission_classes(permissions.IsNotAuthenticated)
     def login(self, request):
         data = request.data
         serializer = self.serializer_class(data=data)
@@ -39,6 +42,7 @@ class AuthenticationViewSet(viewsets.ViewSet):
         )
 
     @list_route(methods=['post'])
+    @permission_classes(permissions.IsNotAuthenticated)
     def signup(self, request):
         data = request.data
         serializer = self.serializer_class(data=data)
@@ -61,36 +65,38 @@ class AuthenticationViewSet(viewsets.ViewSet):
                 user.token = token
                 user.confirm_time = timezone.now()
                 user.save()
-                return Response({
-                    'data': serializers.CustomUserSerializer(user).data,
-                    'status': status.HTTP_201_CREATED,
-                })
+                return Response(
+                    data=serializers.CustomUserSerializer(user).data,
+                    status=status.HTTP_201_CREATED,
+                )
             else:
-                return Response({
-                    'data': 'user_already_exists',
-                    'status': status.HTTP_400_BAD_REQUEST,
-                })
+                return Response(
+                    data='user_already_exists',
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         else:
-            return Response({
-                'data': 'validation_error',
-                'status': status.HTTP_400_BAD_REQUEST,
-            })
+            return Response(
+                data='validation_error',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     @list_route(methods=['get'])
+    @permission_classes(django_permissions.IsAuthenticated)
     def logout(self, request):
         user = request.user
         if user.is_authenticated:
             logout(request)
-            return Response({
-                'data': 'OK',
-                'status': status.HTTP_200_OK,
-            })
-        return Response({
-            'data': 'guest user',
-            'status': status.HTTP_400_BAD_REQUEST,
-        })
+            return Response(
+                data='OK',
+                status=status.HTTP_200_OK,
+            )
+        return Response(
+            data='guest user',
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     @list_route(methods=['get'], url_path='confirm/(?P<token>[a-zA-Z0-9_-]+)')
+    @permission_classes(django_permissions.AllowAny)
     def confirm(self, request, token):
         current_datetime = timezone.now()
         days_link_enable = 1
@@ -102,11 +108,11 @@ class AuthenticationViewSet(viewsets.ViewSet):
         if user and len(user) == 1:
             user[0].is_confirmed = True
             user[0].save()
-            return Response({
-                'data': 'OK',
-                'status': status.HTTP_200_OK,
-            })
-        return Response({
-            'data': 'FAIL',
-            'status': status.HTTP_400_BAD_REQUEST,
-        })
+            return Response(
+                data='OK',
+                status=status.HTTP_200_OK,
+            )
+        return Response(
+            data='FAIL',
+            status=status.HTTP_400_BAD_REQUEST,
+        )
