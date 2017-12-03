@@ -1,6 +1,12 @@
 from rest_framework import viewsets, permissions as django_permissions
+from rest_framework.decorators import list_route
+from rest_framework.response import Response
+from uz_api import ClientInteface, Serializer
 
 from booking import serializers, models, permissions
+
+
+client = ClientInteface()
 
 
 class BookingViewSet(viewsets.ModelViewSet):
@@ -17,3 +23,11 @@ class BookingPersonViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return models.BookingPerson.objects.filter(booking_id__user_id=self.request.user)
+
+
+class UZViewSet(viewsets.ViewSet):
+
+    @list_route(methods=['get'])
+    def stations(self, request):
+        stations = client.stations(name=request.query_params.get('name', ''))
+        return Response(data=Serializer.serialize(stations))
