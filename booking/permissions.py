@@ -10,4 +10,4 @@ class BookingPermission(BasePermission):
 class IsBookingPersonPermissions(BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        return request.user.id == obj.booking_id.user_id.id
+        return request.user.id == obj.booking_id.user_id.id or request.user.is_staff
