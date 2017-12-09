@@ -17,7 +17,35 @@ from rest_framework import permissions as django_permissions
 class PersonViewSet(viewsets.ModelViewSet):
     queryset = models.Person.objects.all()
     serializer_class = serializers.PersonSerializer
-    permission_classes = (permissions.IsPersonOwner, django_permissions.IsAdminUser)
+    permission_classes = (django_permissions.IsAuthenticated,)
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            email_exist = models.Person.objects.filter(user_id=request.user, email=data.get('email')).exists()
+            if not email_exist:
+                person = models.Person()
+                for attr in ['first_name', 'last_name', 'email', 'student_card_number']:
+                    setattr(person, attr, data.get(attr))
+                person.user_id = models.CustomUser.objects.get(user_ptr_id=request.user.id)
+                person.save()
+                return Response(
+                    data=serializers.PersonSerializer(person).data,
+                    status=status.HTTP_201_CREATED,
+                )
+            return Response(
+                data='already_added',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response(
+            data='invalid_data',
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    @list_route(methods=['get'])
+    def get_queryset(self):
+        return models.Person.objects.filter(user_id=self.request.user)
 
 
 class AuthenticationViewSet(viewsets.ViewSet):
