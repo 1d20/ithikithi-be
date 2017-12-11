@@ -16,6 +16,12 @@ coaches = {
 coaches['all'] = coaches['required'] + ['round_trip', 'another_ec']
 
 
+seats = {
+    'required': ['station_from_id', 'station_to_id', 'date_dep', 'train', 'coach_num', 'coach_class', 'coach_type_id', 'change_scheme']
+}
+seats['all'] = seats['required']
+
+
 def validate(data, fields_name):
     return all([attr in data for attr in globals()[fields_name]['required']])
 

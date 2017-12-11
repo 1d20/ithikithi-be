@@ -1,3 +1,5 @@
+import json
+
 from rest_framework import viewsets, status, permissions as django_permissions
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
@@ -65,6 +67,22 @@ class UZViewSet(viewsets.ViewSet):
             result = client.coaches(**request_params)
             return Response(
                 data=Serializer.serialize(result),
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                data='invalid_data',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    @list_route(methods=['get'])
+    def seats(self, request):
+        data = request.query_params
+        if fields.validate(data, 'seats'):
+            request_params = fields.prepare_params(data, 'seats')
+            result = client.seats(**request_params)
+            return Response(
+                data=result,
                 status=status.HTTP_200_OK,
             )
         else:
