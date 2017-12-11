@@ -3,7 +3,7 @@ from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from uz_api import ClientInteface, Serializer
 
-from booking import serializers, models, permissions
+from booking import serializers, models, permissions, fields
 
 
 client = ClientInteface()
@@ -29,22 +29,23 @@ class UZViewSet(viewsets.ViewSet):
 
     @list_route(methods=['get'])
     def stations(self, request):
-        stations = client.stations(name=request.query_params.get('name', ''))
-        return Response(
-            data=Serializer.serialize(stations),
-            status=status.HTTP_200_OK,
-        )
+        if fields.validate(request.query_params, 'stations'):
+            stations = client.stations(name=request.query_params.get('name', ''))
+            return Response(
+                data=Serializer.serialize(stations),
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                data='invalid_data',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     @list_route(methods=['get'])
     def trains(self, request):
-        request_params = {}
-        get_data = request.query_params
-        required_fields = ['station_from_id', 'station_to_id', 'date_dep']
-        if all([attr in get_data for attr in required_fields]):
-            enable_params = required_fields + ['time_dep', 'time_dep_till', 'another_ec', 'search']
-            for attr, val in get_data.items():
-                if attr in enable_params:
-                    request_params[attr] = val
+        data = request.query_params
+        if fields.validate(data, 'trains'):
+            request_params = fields.prepare_params(data, 'trains')
             result = client.trains(**request_params)
             return Response(
                 data=Serializer.serialize(result),
@@ -52,6 +53,22 @@ class UZViewSet(viewsets.ViewSet):
             )
         else:
             return Response(
-                data='bad_request',
+                data='invalid_data',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    @list_route(methods=['get'])
+    def coaches(self, request):
+        data = request.query_params
+        if fields.validate(data, 'coaches'):
+            request_params = fields.prepare_params(data, 'coaches')
+            result = client.coaches(**request_params)
+            return Response(
+                data=Serializer.serialize(result),
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                data='invalid_data',
                 status=status.HTTP_400_BAD_REQUEST,
             )

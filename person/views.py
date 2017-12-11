@@ -58,10 +58,10 @@ class AuthenticationViewSet(viewsets.ViewSet):
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             user = authenticate(username=data['email'], password=data['password'])
-            if user and user.customuser.is_confirmed:
+            if user and user.is_confirmed:
                 login(request, user)
                 return Response(
-                    data=serializers.CustomUserSerializer(user.customuser).data,
+                    data=serializers.CustomUserSerializer(user).data,
                     status=status.HTTP_200_OK,
                 )
         return Response(
@@ -134,7 +134,7 @@ class AuthenticationViewSet(viewsets.ViewSet):
             confirm_time__range=((current_datetime - timedelta(days=days_link_enable)), current_datetime)
         )
         if user and len(user) == 1:
-            user[0].is_confirmed = True
+            user[0].is_active = True
             user[0].save()
             return Response(
                 data='OK',
