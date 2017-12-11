@@ -1,3 +1,4 @@
 Django==2.0
 djangorestframework==3.7.3
 -e git://github.com/1d20/uz-api#egg=uz-api
+sqlparse
