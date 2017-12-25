@@ -1,6 +1,6 @@
 import json
 
-from rest_framework import viewsets, status, permissions as django_permissions
+from rest_framework import viewsets, status, permissions as django_permissions, exceptions
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from uz_api import ClientInteface, Serializer
@@ -38,10 +38,7 @@ class UZViewSet(viewsets.ViewSet):
                 status=status.HTTP_200_OK,
             )
         else:
-            return Response(
-                data='invalid_data',
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise exceptions.ValidationError(detail='invalid_data')
 
     @list_route(methods=['get'])
     def trains(self, request):
@@ -54,10 +51,7 @@ class UZViewSet(viewsets.ViewSet):
                 status=status.HTTP_200_OK,
             )
         else:
-            return Response(
-                data='invalid_data',
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise exceptions.ValidationError(detail='invalid_data')
 
     @list_route(methods=['get'])
     def coaches(self, request):
@@ -70,10 +64,7 @@ class UZViewSet(viewsets.ViewSet):
                 status=status.HTTP_200_OK,
             )
         else:
-            return Response(
-                data='invalid_data',
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise exceptions.ValidationError(detail='invalid_data')
 
     @list_route(methods=['get'])
     def seats(self, request):
@@ -86,7 +77,4 @@ class UZViewSet(viewsets.ViewSet):
                 status=status.HTTP_200_OK,
             )
         else:
-            return Response(
-                data='invalid_data',
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise exceptions.ValidationError(detail='invalid_data')

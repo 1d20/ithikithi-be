@@ -1,6 +1,6 @@
 import secrets
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, exceptions
 
 from django.utils import timezone
 from datetime import timedelta
@@ -23,17 +23,11 @@ class PersonViewSet(viewsets.ModelViewSet):
         data = request.data
         serializer = self.serializer_class(data=data)
         if not serializer.is_valid():
-            return Response(
-                data='invalid_data',
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise exceptions.ValidationError()
 
         email_exist = models.Person.objects.filter(user_id=request.user, email=data.get('email')).exists()
         if email_exist:
-            return Response(
-                data='already_added',
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise exceptions.ParseError(detail='already_added')
 
         person = models.Person()
         for attr in ['first_name', 'last_name', 'email', 'student_card_number']:
@@ -45,8 +39,6 @@ class PersonViewSet(viewsets.ModelViewSet):
             data=serializers.PersonSerializer(person).data,
             status=status.HTTP_201_CREATED,
         )
-
-
 
     @list_route(methods=['get'])
     def get_queryset(self):
@@ -63,16 +55,13 @@ class AuthenticationViewSet(viewsets.ViewSet):
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             user = authenticate(username=data['email'], password=data['password'])
-            if user and user.is_confirmed:
+            if user and user.is_active:
                 login(request, user)
                 return Response(
                     data=serializers.CustomUserSerializer(user).data,
                     status=status.HTTP_200_OK,
                 )
-        return Response(
-            data=serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        raise exceptions.ValidationError()
 
     @list_route(methods=['post'])
     @permission_classes(permissions.IsNotAuthenticated)
@@ -80,17 +69,11 @@ class AuthenticationViewSet(viewsets.ViewSet):
         data = request.data
         serializer = self.serializer_class(data=data)
         if not serializer.is_valid():
-            return Response(
-                data='validation_error',
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise exceptions.ValidationError()
 
         user = models.CustomUser.objects.filter(email=data['email'])
         if user:
-            return Response(
-                data='user_already_exists',
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise exceptions.ParseError(detail='user_already_exists')
 
         user = models.CustomUser.objects.create_user(
             username=data['email'],
@@ -140,10 +123,7 @@ class AuthenticationViewSet(viewsets.ViewSet):
             confirm_time__range=((current_datetime - timedelta(days=days_link_enable)), current_datetime)
         )
         if not (user and len(user) == 1):
-            return Response(
-                data='FAIL',
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise exceptions.ParseError(detail='FAIL')
 
         user[0].is_active = True
         user[0].save()

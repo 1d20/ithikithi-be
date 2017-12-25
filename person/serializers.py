@@ -17,4 +17,4 @@ class AuthenticationSerializer(serializers.Serializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CustomUser
-        fields = ['username', 'email', 'is_confirmed', 'confirm_time']
+        fields = ['username', 'email', 'confirm_time']
