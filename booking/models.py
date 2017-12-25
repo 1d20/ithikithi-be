@@ -15,7 +15,7 @@ class BookingPerson(models.Model):
     booking_id = models.ForeignKey(Booking, on_delete=models.CASCADE)
     from_location = models.CharField(max_length=1000) # TODO change to JsonField for PostgreSQL
     to_location = models.CharField(max_length=1000) # TODO change to JsonField for PostgreSQL
-    date = models.DateTimeField(default=timezone.now())
+    date = models.DateTimeField(default=timezone.now)
     train_number = models.CharField(max_length=8)
     wagon = models.CharField(max_length=5)
     place = models.CharField(max_length=5)
@@ -23,7 +23,7 @@ class BookingPerson(models.Model):
     last_name = models.CharField(max_length=63)
     email = models.EmailField()
     student_card_number = models.CharField(max_length=10)
-    created_on = models.DateTimeField(default=timezone.now())
+    created_on = models.DateTimeField(default=timezone.now)
     need_to_change_ticket = models.BooleanField(default=False)
 
     def __str__(self):
